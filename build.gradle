@@ -1,7 +1,7 @@
 // this part adds in ForgeGradle
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -11,25 +11,27 @@ buildscript {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
     }
-    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT' }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+    }
 }
-
-apply plugin: "forge"
+apply plugin: 'net.minecraftforge.gradle.forge'
 
 // stuff specific to my mod
+version = "4.8-SNAPSHOT"
 group = 'com.github.abrarsyed'
-version = "4.7.1"
 archivesBaseName = 'secretroomsmod'
 
 minecraft {
-    version = "1.7.10-10.13.2.1291" // grab latest forge
+    version = "1.10.2-12.18.2.2125" // grab latest forge
     runDir = "run"
+    mappings = "snapshot_20161111"
 
-    // replacing
-    replace "@CHANGE_VERSION@", "[4.7,)"
-    replace "@MC_VERSION@", project.minecraft.version
-    replace "@VERSION@", project.version
-    replaceIn "SecretRooms.java"
+    // replacing not needed at now
+    // replace "@CHANGE_VERSION@", "[4.7,)"
+    // replace "@MC_VERSION@", project.minecraft.version
+    // replace "@VERSION@", project.version
+    // replaceIn "SecretRooms.java"
 }
 
 // add some stuff to the version
@@ -39,21 +41,22 @@ version = "${minecraft.version}-$version.${System.getenv().BUILD_NUMBER}"
 logger.lifecycle ""+version
 
 processResources {
+    // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
 
-    // replace stuff in text files, not binary ones.
+    // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
+        include 'mcmod.info'
 
-        // replace version and MCVersion
-        // forge version is also accessible via project.minecraftforgeVersion
-        // it contains the full minecraft version, including buildNumber
+        // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
 
-    // copy everything else, thats not text
-    from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
 }
 
 repositories {
@@ -69,28 +72,10 @@ repositories {
 
 dependencies {
     // waila
-    compile "mcp.mobius.waila:Waila:1.5.8_1.7.10"
+    compile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
 
 	// malisis doors
-    compile 'net.malisis:malisisdoors:1.7.10-1.4.3:dev'
-}
-
-// because the normal output has been made to be obfuscated
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'dev'
-}
-
-// add a source jar
-task sourceJar(type: Jar, dependsOn: "sourceMainJava") {
-    from "build/sources/java"
-    classifier = 'sources'
-}
-
-// add a javadoc jar
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
+    // compile 'net.malisis:malisisdoors:1.10.2-5.1.4:dev'
 }
 
 // deployement stuff
@@ -98,71 +83,3 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 configurations { deployerJars }
 
 dependencies { deployerJars "org.apache.maven.wagon:wagon-ssh:2.2" }
-
-artifacts {
-    archives sourceJar
-    archives deobfJar
-    archives javadocJar
-}
-
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            configuration = configurations.deployerJars
-
-            repository(url: "http://files.minecraftforge.net/maven/manage/upload") {
-                authentication(userName: "AbrarSyed", password: project.hasProperty(forgeMavenPass) ? null : project.getProperty('forgeMavenPass')) // the elvis operator. look it up.
-            }
-
-            pom {
-                groupId = project.group
-                version = project.version
-                artifactId = project.archivesBaseName
-                project {
-                    name project.archivesBaseName
-                    packaging 'jar'
-                    description 'SecretRoomsMod '
-                    url 'https://github.com/AbrarSyed/SecretRoomsMod-forge'
-
-                    scm {
-                        url 'https://github.com/AbrarSyed/SecretRoomsMod-forge'
-                        connection 'scm:git:git://github.com/AbrarSyed/SecretRoomsMod-forge.git'
-                        developerConnection 'scm:git:git@github.com:AbrarSyed/SecretRoomsMod-forge.git'
-                    }
-
-                    issueManagement {
-                        system 'github'
-                        url 'https://github.com/AbrarSyed/SecretRoomsMod-forge/issues'
-                    }
-
-                    licenses {
-                        license {
-                            name 'The Eclipse Public Liscence'
-                            url 'http://www.eclipse.org/legal/epl-v10.html'
-                            distribution 'repo'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'AbrarSyed'
-                            name 'AbrarSyed'
-                            roles { role 'developer' }
-                        }
-                        developer {
-                            id 'AlexBegt'
-                            name 'AlexBegt'
-                            roles { role 'contributor' }
-                        }
-                        developer {
-                            id 'CaptainShadows'
-                            name 'CaptainShadows'
-                            roles { role 'contributor' }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
