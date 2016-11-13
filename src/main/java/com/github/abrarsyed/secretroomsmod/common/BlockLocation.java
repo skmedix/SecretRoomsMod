@@ -1,14 +1,13 @@
 package com.github.abrarsyed.secretroomsmod.common;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
+import com.google.common.base.Throwables;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
-import com.google.common.base.Throwables;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class BlockLocation
 {
@@ -19,7 +18,7 @@ public class BlockLocation
         this.x = x;
         this.y = y;
         this.z = z;
-        this.dimId = world.provider.dimensionId;
+	    this.dimId = world.provider.getDimension();
     }
 
     public BlockLocation(int x, int y, int z, int dimid)

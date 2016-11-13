@@ -8,7 +8,7 @@ public class MaterialFakeAir extends Material
 
 	public MaterialFakeAir()
 	{
-		super(MapColor.airColor);
+		super(MapColor.AIR);
 	}
 
 	@Override
@@ -20,7 +20,6 @@ public class MaterialFakeAir extends Material
 	/**
 	 * Will prevent grass from growing on dirt underneath and kill any grass below it if it returns true
 	 */
-	@Override
 	public boolean getCanBlockGrass()
 	{
 		return false;

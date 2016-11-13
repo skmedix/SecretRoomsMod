@@ -1,13 +1,14 @@
 package com.github.abrarsyed.secretroomsmod.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-
 import com.github.abrarsyed.secretroomsmod.network.PacketManager;
 import com.github.abrarsyed.secretroomsmod.network.PacketShowToggle;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author AbrarSyed
@@ -37,9 +38,8 @@ public class CommandShow extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender var1, String[] var2)
-	{
-	    PacketManager.sendToPlayer(new PacketShowToggle(), CommandBase.getCommandSenderAsPlayer(var1));
+	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		PacketManager.sendToPlayer(new PacketShowToggle(), CommandBase.getCommandSenderAsPlayer(sender));
 	}
 
     @Override

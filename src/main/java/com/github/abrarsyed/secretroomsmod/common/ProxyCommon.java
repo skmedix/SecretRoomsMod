@@ -1,16 +1,16 @@
 package com.github.abrarsyed.secretroomsmod.common;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
-
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Unload;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
 
 public class ProxyCommon
 {
@@ -42,20 +42,20 @@ public class ProxyCommon
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onWorldLoad(Load event)
     {
-        int dim = event.world.provider.dimensionId;
-        fakes.put(dim, new FakeWorld(event.world));
+        int dim = event.getWorld().provider.getDimension();
+        fakes.put(dim, new FakeWorld(event.getWorld()));
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onWorldUnLoad(Unload event)
     {
-        int dim = event.world.provider.dimensionId;
+        int dim = event.getWorld().provider.getDimension();
         fakes.remove(dim);
     }
 
     public FakeWorld getFakeWorld(World world)
     {
-        int dim = world.provider.dimensionId;
+        int dim = world.provider.getDimension();
         return fakes.get(dim);
     }
 
